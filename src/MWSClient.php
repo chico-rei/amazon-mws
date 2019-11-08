@@ -1171,6 +1171,37 @@ class MWSClient{
 	    
 	    return $result;
     }
+	
+    /**
+     * Update tracking number
+     *
+     * @param array $array 
+     * @return array feed submission result
+     * @todo gérer le multi-colis
+     */
+    public function updateTrackingNumber(array $array = [])
+    {
+        $feed = [
+            'MessageType' => 'OrderFulfillment',
+            'Message' => []
+        ];
+
+        $feed['Message'][] = [
+            'MessageID' => rand(),
+            'OperationType' => 'Update',
+            'OrderFulfillment' => [
+                'AmazonOrderID' => $array['AmazonOrderID'],
+                'FulfillmentDate' => gmdate(self::DATE_FORMAT, $array['FulfillmentDate']->getTimestamp()),
+                'FulfillmentData' => [
+                    'CarrierName' => $array['CarrierName'],
+                    'ShippingMethod' => $array['ShippingMethod'],
+                    'ShipperTrackingNumber' => $array['ShipperTrackingNumber']
+                ]
+            ]
+        ];
+
+        return $this->SubmitFeed('_POST_ORDER_FULFILLMENT_DATA_', $feed, false);
+    }
 
     /**
      * Request MWS
